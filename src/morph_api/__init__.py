@@ -4,6 +4,11 @@ from typing import List, Union, Optional
 import spacy
 import uvicorn
 
+HOST = "127.0.0.1"
+PORT = 19634
+SERVER_VER = 1
+YOMITAN_VER = "25.12.16.0"
+
 app = FastAPI()
 
 # Load the spaCy model
@@ -11,8 +16,8 @@ try:
     nlp = spacy.load("en_core_web_sm")
 except OSError:
     # Fallback if the model is not found (though it should be installed)
-    import spacy.cli
-    spacy.cli.download("en_core_web_sm")
+    from spacy.cli.download import download as spacy_download
+    spacy_download("en_core_web_sm")
     nlp = spacy.load("en_core_web_sm")
 
 class TokenizeRequest(BaseModel):
@@ -32,7 +37,11 @@ class ScanResult(BaseModel):
 
 @app.post("/serverVersion")
 async def server_version():
-    return {"version": 1}
+    return {"version": SERVER_VER}
+
+@app.post("/yomitanVersion")
+async def yomitan_version():
+    return {"version": YOMITAN_VER}
 
 def tokenize_single_text(text: str, index: int) -> ScanResult:
     doc = nlp(text)
@@ -56,7 +65,7 @@ async def tokenize(request: TokenizeRequest) -> List[ScanResult]:
         return [tokenize_single_text(t, i) for i, t in enumerate(request.text)]
 
 def main():
-    uvicorn.run(app, host="127.0.0.1", port=19633)
+    uvicorn.run(app, host=HOST, port=PORT)
 
 if __name__ == "__main__":
     main()

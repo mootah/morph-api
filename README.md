@@ -21,6 +21,22 @@ This project provides a similar API to [yomitan-api](https://github.com/yomidevs
     }
     ```
 
+### `/yomitanVersion`
+
+#### Request
+
+- method: `POST`
+
+#### Example
+
+- response (200):
+
+    ```
+    {
+        "version": "<latest yomitan version>"
+    }
+    ```
+
 ### `/tokenize`
 
 #### Request
