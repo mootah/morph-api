@@ -7,7 +7,11 @@ authors = [
     { name = "mootah", email = "44580337+mootah@users.noreply.github.com" }
 ]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "fastapi>=0.133.1",
+    "spacy>=3.8.11",
+    "uvicorn>=0.41.0",
+]
 
 [project.scripts]
 morph-api = "morph_api:main"
