@@ -1,7 +1,7 @@
 
 # Morph API for asbplayer annotation
 
-This project provides a similar API to [yomitan-api](yomidevs/yomitan-api) for the annotation functionality of [asbplayer](killergerbah/asbplayer), based on [spaCy](explosion/spaCy)'s tokenizer.
+This project provides a similar API to [yomitan-api](https://github.com/yomidevs/yomitan-api) for the annotation functionality of [asbplayer](https://github.com/killergerbah/asbplayer), based on [spaCy](https://github.com/explosion/spaCy)'s tokenizer.
 
 ## API
 
@@ -14,6 +14,7 @@ This project provides a similar API to [yomitan-api](yomidevs/yomitan-api) for t
 #### Example
 
 - response (200):
+
     ```
     {
         "version": 1
@@ -32,6 +33,7 @@ This project provides a similar API to [yomitan-api](yomidevs/yomitan-api) for t
 #### Example
 
 - request:
+
     ```
     {
         "text": "This is it.",
@@ -40,6 +42,7 @@ This project provides a similar API to [yomitan-api](yomidevs/yomitan-api) for t
     ```
 
 - response (200):
+
     ```
     [
         {
