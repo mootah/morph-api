@@ -96,3 +96,69 @@ This project provides a similar API to [yomitan-api](https://github.com/yomidevs
     ]
     ```
 
+### `/termEntries`
+
+#### Request
+
+- method: `POST`
+- body:
+    - `term`: `string`
+
+#### Example
+
+- request:
+
+    ```
+    {
+        "term": "running"
+    }
+    ```
+
+- response (200):
+
+    ```
+    {
+        "dictionaryEntries": [
+            {
+                "type": "term",
+                "isPrimary": true,
+                "textProcessorRuleChainCandidates": [
+                    []
+                ],
+                "inflectionRuleChainCandidates": [],
+                "score": 0,
+                "frequencyOrder": 0,
+                "dictionaryIndex": 0,
+                "dictionaryAlias": "spaCy",
+                "sourceTermExactMatchCount": 1,
+                "matchPrimaryReading": false,
+                "maxOriginalTextLength": 7,
+                "headwords": [
+                    {
+                        "index": 0,
+                        "term": "running",
+                        "reading": "",
+                        "sources": [
+                            {
+                                "originalText": "running",
+                                "transformedText": "running",
+                                "deinflectedText": "run",
+                                "matchType": "exact",
+                                "matchSource": "term",
+                                "isPrimary": true
+                            }
+                        ],
+                        "tags": [],
+                        "wordClasses": [
+                            "VERB"
+                        ]
+                    }
+                ],
+                "definitions": [],
+                "frequencies": [],
+                "pronunciations": []
+            }
+        ],
+        "originalTextLength": 7
+    }
+    ```

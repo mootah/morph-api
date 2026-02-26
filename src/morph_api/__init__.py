@@ -25,6 +25,46 @@ class TokenizeRequest(BaseModel):
     text: Union[str, List[str]]
     scanLength: int
 
+class TermEntriesRequest(BaseModel):
+    term: str
+
+class TermSource(BaseModel):
+    originalText: str
+    transformedText: str
+    deinflectedText: str
+    matchType: str
+    matchSource: str
+    isPrimary: bool
+
+class Headword(BaseModel):
+    index: int
+    term: str
+    reading: str
+    sources: List[TermSource]
+    tags: List[dict]
+    wordClasses: List[str]
+
+class DictionaryEntry(BaseModel):
+    type: str
+    isPrimary: bool
+    textProcessorRuleChainCandidates: List[List[str]]
+    inflectionRuleChainCandidates: List[dict]
+    score: int
+    frequencyOrder: int
+    dictionaryIndex: int
+    dictionaryAlias: str
+    sourceTermExactMatchCount: int
+    matchPrimaryReading: bool
+    maxOriginalTextLength: int
+    headwords: List[Headword]
+    definitions: List[dict]
+    frequencies: List[dict]
+    pronunciations: List[dict]
+
+class TermEntriesResponse(BaseModel):
+    dictionaryEntries: List[DictionaryEntry]
+    originalTextLength: int
+
 class TokenReading(BaseModel):
     text: str
     reading: str
@@ -92,6 +132,57 @@ async def tokenize(request: Request) -> List[ScanResult]:
         return [tokenize_single_text(tokenize_request.text, 0)]
     else:
         return [tokenize_single_text(t, i) for i, t in enumerate(tokenize_request.text)]
+
+@app.post("/termEntries", response_model=TermEntriesResponse)
+async def term_entries(request: TermEntriesRequest) -> TermEntriesResponse:
+    doc = nlp(request.term)
+    dictionary_entries = []
+
+    for token in doc:
+        if token.is_space:
+            continue
+
+        source = TermSource(
+            originalText=token.text,
+            transformedText=token.text,
+            deinflectedText=token.lemma_,
+            matchType="exact",
+            matchSource="term",
+            isPrimary=True
+        )
+
+        headword = Headword(
+            index=0,
+            term=token.text,
+            reading="",
+            sources=[source],
+            tags=[],
+            wordClasses=[token.pos_]
+        )
+
+        entry = DictionaryEntry(
+            type="term",
+            isPrimary=True,
+            textProcessorRuleChainCandidates=[[]],
+            inflectionRuleChainCandidates=[],
+            score=0,
+            frequencyOrder=0,
+            dictionaryIndex=0,
+            dictionaryAlias="spaCy",
+            sourceTermExactMatchCount=1,
+            matchPrimaryReading=False,
+            maxOriginalTextLength=len(token.text),
+            headwords=[headword],
+            definitions=[],
+            frequencies=[],
+            pronunciations=[]
+        )
+        dictionary_entries.append(entry)
+
+    return TermEntriesResponse(
+        dictionaryEntries=dictionary_entries,
+        originalTextLength=len(request.term)
+    )
 
 def main():
     uvicorn.run(app, host=HOST, port=PORT)
