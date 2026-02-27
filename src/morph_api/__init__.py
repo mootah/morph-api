@@ -133,9 +133,37 @@ async def tokenize(request: Request) -> List[ScanResult]:
     else:
         return [tokenize_single_text(t, i) for i, t in enumerate(tokenize_request.text)]
 
-@app.post("/termEntries", response_model=TermEntriesResponse)
-async def term_entries(request: TermEntriesRequest) -> TermEntriesResponse:
-    doc = nlp(request.term)
+@app.post(
+    "/termEntries",
+    response_model=TermEntriesResponse,
+    openapi_extra={
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "schema": TermEntriesRequest.model_json_schema()
+                },
+                "application/octet-stream": {
+                    "schema": {"type": "string", "format": "binary"},
+                    "description": "JSON bytes of the term (must match TermEntriesRequest schema)"
+                }
+            }
+        }
+    }
+)
+async def term_entries(request: Request) -> TermEntriesResponse:
+    body = await request.body()
+    if not body:
+        raise HTTPException(status_code=422, detail="Empty body")
+
+    try:
+        data = json.loads(body)
+        term_request = TermEntriesRequest.model_validate(data)
+    except json.JSONDecodeError as e:
+        raise HTTPException(status_code=422, detail=f"Invalid JSON: {str(e)}")
+    except ValidationError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
+    doc = nlp(term_request.term)
     dictionary_entries = []
 
     for token in doc:
@@ -181,7 +209,7 @@ async def term_entries(request: TermEntriesRequest) -> TermEntriesResponse:
 
     return TermEntriesResponse(
         dictionaryEntries=dictionary_entries,
-        originalTextLength=len(request.term)
+        originalTextLength=len(term_request.term)
     )
 
 def main():

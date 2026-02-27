@@ -42,6 +42,7 @@ This project provides a similar API to [yomitan-api](https://github.com/yomidevs
 #### Request
 
 - method: `POST`
+- Content-Type: `application/json` or `application/octet-stream` (for JSON bytes)
 - body:
     - `text`: `string|list[string]`
     - `scanLength`: `int`
@@ -101,6 +102,7 @@ This project provides a similar API to [yomitan-api](https://github.com/yomidevs
 #### Request
 
 - method: `POST`
+- Content-Type: `application/json` or `application/octet-stream` (for JSON bytes)
 - body:
     - `term`: `string`
 
