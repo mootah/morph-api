@@ -2,9 +2,12 @@ from fastapi import FastAPI, Request, HTTPException
 from pydantic import BaseModel, ValidationError
 from typing import List, Union, Optional
 from functools import lru_cache
+import logging
 import spacy
 import uvicorn
+from bs4 import BeautifulSoup
 import json
+import re
 
 HOST = "127.0.0.1"
 PORT = 19634
@@ -12,6 +15,8 @@ SERVER_VER = 1
 YOMITAN_VER = "25.12.16.0"
 
 app = FastAPI()
+logger = logging.getLogger("uvicorn")
+
 
 # Load the spaCy model
 try:
@@ -85,7 +90,18 @@ async def server_version():
 async def yomitan_version():
     return {"version": YOMITAN_VER}
 
+def sanitize_text(text):
+    # Remove HTML tags
+    soup = BeautifulSoup(text, "html.parser")
+    text = soup.get_text()
+    # Remove cloze deletions
+    text = re.sub(r'\{\{c\d+::([^}]+)\}\}', r'\1', text)
+    # Keep only ASCII characters
+    # text = re.sub(r'[^\x00-\x7F]+', '', text)
+    return text
+
 def tokenize_single_text(text: str, index: int) -> ScanResult:
+    text = sanitize_text(text)
     doc = nlp(text)
     content = []
     for token in doc:
@@ -148,7 +164,7 @@ def _term_entries_internal(body: bytes) -> TermEntriesResponse:
     except ValidationError as e:
         raise HTTPException(status_code=422, detail=str(e))
 
-    print("term:", term_request.term)
+    logger.debug(f"term: {repr(term_request.term)}")
     doc = nlp(term_request.term)
     dictionary_entries = []
 
