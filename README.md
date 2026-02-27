@@ -5,6 +5,21 @@ This project provides a similar API to [yomitan-api](https://github.com/yomidevs
 
 ## Installation
 
+1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/).
+2. Clone this repository:
+   ```bash
+   git clone https://github.com/mootah/morph-api.git
+   cd morph-api
+   ```
+3. Initialize the project:
+   ```bash
+   uv sync
+   ```
+4. Start the server:
+   ```bash
+   uv run task server
+   ```
+5. In asbplayer, set the `Yomitan API URL` to `http://127.0.0.1:19634`.
 
 ## API
 
