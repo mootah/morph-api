@@ -32,7 +32,7 @@ dev = {
   use_vars = true
 }
 server = {
-  cmd = "uvicorn app.main:app --host {host} --port {port} --workers 4 --log-level error",
+  cmd = "uvicorn app.main:app --host {host} --port {port} --workers 4 --log-level info --no-access-log",
   use_vars = true
 }
 test = "uv run tests/test_api.py"
