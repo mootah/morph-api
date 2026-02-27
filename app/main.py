@@ -163,7 +163,8 @@ def _term_entries_internal(body: bytes) -> TermEntriesResponse:
         raise HTTPException(status_code=422, detail=str(e))
 
     # logger.info(f"term: {repr(term_request.term)}")
-    doc = nlp(term_request.term)
+    originalText = term_request.term
+    doc = nlp(originalText.lower())
     dictionary_entries = []
 
     for token in doc:
@@ -171,8 +172,8 @@ def _term_entries_internal(body: bytes) -> TermEntriesResponse:
             continue
 
         source = TermSource(
-            originalText=token.text,
-            transformedText=token.lower_,
+            originalText=originalText,
+            transformedText=token.text,
             deinflectedText=token.lemma_,
             matchType="exact",
             matchSource="term",
@@ -181,7 +182,7 @@ def _term_entries_internal(body: bytes) -> TermEntriesResponse:
 
         headword = Headword(
             index=0,
-            term=token.lower_,
+            term=token.text,
             reading="",
             sources=[source],
             tags=[],
@@ -199,7 +200,7 @@ def _term_entries_internal(body: bytes) -> TermEntriesResponse:
             dictionaryAlias="spaCy",
             sourceTermExactMatchCount=1,
             matchPrimaryReading=False,
-            maxOriginalTextLength=len(token.text),
+            maxOriginalTextLength=len(originalText),
             headwords=[headword],
             definitions=[],
             frequencies=[],
@@ -209,7 +210,7 @@ def _term_entries_internal(body: bytes) -> TermEntriesResponse:
 
     return TermEntriesResponse(
         dictionaryEntries=dictionary_entries,
-        originalTextLength=len(term_request.term)
+        originalTextLength=len(originalText)
     )
 
 @app.post(
